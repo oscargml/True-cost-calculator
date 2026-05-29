@@ -5,6 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Opportunity Cost Calculator</title>
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "The True Cost Calculator",
+      "url": "https://yourwebsite.com/opportunity-cost-calculator",
+      "description": "An interactive opportunity cost calculator that computes the long-term investment value of your monthly subscription services over 10 years at an 8% return rate.",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "All",
+      "browserRequirements": "Requires JavaScript. Requires HTML5.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "featureList": [
+        "Calculates yearly subscription expenses",
+        "Calculates 10-year cumulative costs",
+        "Calculates 10-year investment opportunity cost assuming an 8% annual return"
+      ]
+    }
+    </script>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans p-6">
 
@@ -15,68 +38,3 @@
         <div class="mb-6">
             <label class="block text-sm font-semibold mb-2">Total Monthly Subscriptions ($)</label>
             <input type="number" id="monthlyCost" placeholder="e.g., 50" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-        </div>
-
-        <button onclick="calculateCost()" class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition duration-200">
-            Calculate True Cost
-        </button>
-
-        <div id="results" class="mt-8 hidden">
-            <div class="bg-blue-50 p-6 rounded-lg border border-blue-100">
-                <h2 class="text-lg font-semibold text-gray-700 mb-4">Your Results:</h2>
-                <ul class="space-y-3">
-                    <li class="flex justify-between border-b border-blue-200 pb-2">
-                        <span>Cost per Year:</span> 
-                        <span id="yearlyCost" class="font-bold text-red-500"></span>
-                    </li>
-                    <li class="flex justify-between border-b border-blue-200 pb-2">
-                        <span>Cost in 10 Years:</span> 
-                        <span id="tenYearCost" class="font-bold text-red-500"></span>
-                    </li>
-                    <li class="flex justify-between pt-2">
-                        <span class="font-semibold text-gray-900">10-Yr Investment Value*:</span> 
-                        <span id="opportunityCost" class="font-bold text-green-600 text-xl"></span>
-                    </li>
-                </ul>
-                <p class="text-xs text-gray-400 mt-3">*Assuming an average 8% annual stock market return.</p>
-            </div>
-
-            <div class="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-center">
-                <h3 class="font-bold text-yellow-800 mb-2">Stop Wasting, Start Investing!</h3>
-                <p class="text-sm text-yellow-700 mb-4">Put that money to work. Open an account today and get a free stock.</p>
-                <a href="#" class="inline-block bg-yellow-500 text-white font-bold py-2 px-6 rounded-full hover:bg-yellow-600 transition">
-                    Start Investing on [Affiliate Partner]
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        function calculateCost() {
-            const monthly = parseFloat(document.getElementById('monthlyCost').value);
-            
-            if (isNaN(monthly) || monthly <= 0) {
-                alert("Please enter a valid monthly amount.");
-                return;
-            }
-
-            const yearly = monthly * 12;
-            const tenYear = yearly * 10;
-            
-            // Calculate compound interest for opportunity cost (monthly contributions, 8% annual return)
-            const rate = 0.08 / 12; // Monthly interest rate
-            const months = 10 * 12; // 10 years
-            const futureValue = monthly * ((Math.pow(1 + rate, months) - 1) / rate);
-
-            // Update UI
-            document.getElementById('yearlyCost').innerText = '$' + yearly.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
-            document.getElementById('tenYearCost').innerText = '$' + tenYear.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
-            document.getElementById('opportunityCost').innerText = '$' + futureValue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
-
-            // Show results
-            document.getElementById('results').classList.remove('hidden');
-        }
-    </script>
-</body>
-</html>
-
