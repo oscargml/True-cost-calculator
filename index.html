@@ -1,110 +1,271 @@
+This is a complete, enhanced HTML document for an "Opportunity Cost Calculator" app. You can run it directly in your browser.
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Opportunity Cost Calculator</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebApplication",
-      "name": "The True Cost Calculator",
-      "url": "https://yourwebsite.com/opportunity-cost-calculator",
-      "description": "An interactive opportunity cost calculator that computes the long-term investment value of your monthly subscription services over 10 years at an 8% return rate.",
-      "applicationCategory": "FinanceApplication",
-      "operatingSystem": "All",
-      "browserRequirements": "Requires JavaScript. Requires HTML5.",
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "USD"
-      },
-      "featureList": [
-        "Calculates yearly subscription expenses",
-        "Calculates 10-year cumulative costs",
-        "Calculates 10-year investment opportunity cost assuming an 8% annual return"
-      ]
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>True Cost • Subscription Opportunity Calculator</title>
+  <!-- Font Awesome 6 for crisp icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Additional custom styles for subtle animations & polish -->
+  <style>
+    body {
+      background: linear-gradient(145deg, #f8fafc 0%, #eef2f6 100%);
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
     }
-    </script>
+    .card-shadow {
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.03);
+    }
+    .result-value {
+      transition: all 0.2s ease;
+    }
+    .progress-ring {
+      transition: stroke-dashoffset 0.5s ease-in-out;
+    }
+    .input-focus:focus-within {
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4);
+      border-radius: 0.75rem;
+    }
+    .highlight-glow {
+      animation: softPulse 2.2s infinite alternate;
+    }
+    @keyframes softPulse {
+      0% { box-shadow: 0 0 8px rgba(34, 197, 94, 0.3); }
+      100% { box-shadow: 0 0 18px rgba(34, 197, 94, 0.7); }
+    }
+    .slide-up {
+      animation: slideUp 0.35s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+    }
+    @keyframes slideUp {
+      0% { opacity: 0; transform: translateY(20px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+  </style>
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans p-6">
+<body class="min-h-screen flex items-center justify-center p-4 md:p-6">
 
-    <div class="max-w-xl mx-auto mt-10 bg-white p-8 rounded-xl shadow-lg border border-gray-100">
-        <h1 class="text-3xl font-bold text-center text-blue-600 mb-2">The True Cost Calculator</h1>
-        <p class="text-center text-gray-500 mb-8">See what your monthly subscriptions are actually costing your future self.</p>
-
-        <form id="calcForm" onsubmit="calculateCost(event)">
-            <div class="mb-6">
-                <label for="monthlyCost" class="block text-sm font-semibold mb-2">Total Monthly Subscriptions ($)</label>
-                <input type="number" id="monthlyCost" step="0.01" min="0.01" placeholder="e.g., 50" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-            </div>
-
-            <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition duration-200">
-                Calculate True Cost
-            </button>
-        </form>
-
-        <div id="results" class="mt-8 hidden">
-            <div class="bg-blue-50 p-6 rounded-lg border border-blue-100">
-                <h2 class="text-lg font-semibold text-gray-700 mb-4">Your Results:</h2>
-                <ul class="space-y-3">
-                    <li class="flex justify-between border-b border-blue-200 pb-2">
-                        <span>Cost per Year:</span> 
-                        <span id="yearlyCost" class="font-bold text-red-500"></span>
-                    </li>
-                    <li class="flex justify-between border-b border-blue-200 pb-2">
-                        <span>Cost in 10 Years:</span> 
-                        <span id="tenYearCost" class="font-bold text-red-500"></span>
-                    </li>
-                    <li class="flex justify-between pt-2">
-                        <span class="font-semibold text-gray-900">10-Yr Investment Value*:</span> 
-                        <span id="opportunityCost" class="font-bold text-green-600 text-xl"></span>
-                    </li>
-                </ul>
-                <p class="text-xs text-gray-400 mt-3">*Assuming an average 8% annual stock market return.</p>
-            </div>
-
-            <div class="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-center">
-                <h3 class="font-bold text-yellow-800 mb-2">Stop Wasting, Start Investing!</h3>
-                <p class="text-sm text-yellow-700 mb-4">Put that money to work. Open an account today and get a free stock.</p>
-                <a href="#" class="inline-block bg-yellow-500 text-white font-bold py-2 px-6 rounded-full hover:bg-yellow-600 transition">
-                    Start Investing on [Affiliate Partner]
-                </a>
-            </div>
+  <div class="w-full max-w-2xl mx-auto">
+    <!-- Main Card -->
+    <div class="bg-white/90 backdrop-blur-md rounded-3xl card-shadow p-6 md:p-8 transition-all duration-300">
+      
+      <!-- Header with icon -->
+      <div class="flex flex-col items-center text-center mb-6">
+        <div class="bg-blue-100 p-3 rounded-full mb-3 shadow-sm">
+          <i class="fas fa-calculator text-blue-700 text-3xl"></i>
         </div>
+        <h1 class="text-3xl md:text-4xl font-extrabold text-gray-800 tracking-tight">
+          The <span class="text-blue-600">True Cost</span> Calculator
+        </h1>
+        <p class="text-gray-500 mt-2 max-w-md text-sm md:text-base">
+          Every subscription chips away at your future wealth. See the hidden fortune you could be building.
+        </p>
+      </div>
+
+      <!-- Form Section -->
+      <form id="calcForm" class="space-y-5" onsubmit="return false;">
+        <div class="input-focus transition-all">
+          <label for="monthlyCost" class="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+            <i class="fas fa-wallet text-blue-500"></i> Monthly subscriptions total
+          </label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <span class="text-gray-400 font-medium text-lg">$</span>
+            </span>
+            <input 
+              type="number" 
+              id="monthlyCost" 
+              step="0.01" 
+              min="0.01" 
+              placeholder="e.g., 79.99" 
+              class="w-full pl-10 pr-4 py-3.5 border border-gray-200 rounded-xl bg-gray-50 text-gray-900 font-medium text-lg focus:outline-none focus:ring-0 focus:border-blue-400 transition-colors"
+              autofocus
+              required
+            >
+          </div>
+          <p class="text-xs text-gray-400 mt-1.5 flex items-center gap-1">
+            <i class="fas fa-info-circle"></i> Netflix, Spotify, gym, apps – add them all up.
+          </p>
+        </div>
+
+        <!-- Quick suggestion chips -->
+        <div class="flex flex-wrap gap-2 mt-1">
+          <span class="text-xs font-semibold text-gray-500 self-center">Quick add:</span>
+          <button type="button" onclick="setQuickAmount(15.99)" class="px-3 py-1.5 bg-gray-100 hover:bg-blue-50 text-gray-700 hover:text-blue-700 text-xs font-medium rounded-full border border-gray-200 transition">Netflix</button>
+          <button type="button" onclick="setQuickAmount(11.99)" class="px-3 py-1.5 bg-gray-100 hover:bg-blue-50 text-gray-700 hover:text-blue-700 text-xs font-medium rounded-full border border-gray-200 transition">Spotify</button>
+          <button type="button" onclick="setQuickAmount(45.00)" class="px-3 py-1.5 bg-gray-100 hover:bg-blue-50 text-gray-700 hover:text-blue-700 text-xs font-medium rounded-full border border-gray-200 transition">Gym</button>
+          <button type="button" onclick="setQuickAmount(9.99)" class="px-3 py-1.5 bg-gray-100 hover:bg-blue-50 text-gray-700 hover:text-blue-700 text-xs font-medium rounded-full border border-gray-200 transition">iCloud+</button>
+        </div>
+
+        <button 
+          type="submit" 
+          id="calculateBtn"
+          onclick="calculateCost()"
+          class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-3.5 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2 text-lg"
+        >
+          <i class="fas fa-chart-line"></i> Reveal Future Cost
+        </button>
+      </form>
+
+      <!-- Dynamic Results Area (hidden by default) -->
+      <div id="resultsPanel" class="mt-8 hidden slide-up">
+        
+        <!-- Core numbers in cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+          <div class="bg-red-50 p-4 rounded-2xl border border-red-100 text-center">
+            <i class="fas fa-calendar-alt text-red-400 mb-1"></i>
+            <p class="text-xs font-semibold text-red-600 uppercase tracking-wide">Yearly drain</p>
+            <p id="yearlyCostDisplay" class="text-2xl font-extrabold text-red-600 mt-1">$0</p>
+          </div>
+          <div class="bg-orange-50 p-4 rounded-2xl border border-orange-100 text-center">
+            <i class="fas fa-clock text-orange-400 mb-1"></i>
+            <p class="text-xs font-semibold text-orange-600 uppercase tracking-wide">10-year cost</p>
+            <p id="tenYearCostDisplay" class="text-2xl font-extrabold text-orange-600 mt-1">$0</p>
+          </div>
+          <div class="bg-emerald-50 p-4 rounded-2xl border border-emerald-100 text-center relative highlight-glow">
+            <i class="fas fa-seedling text-emerald-500 mb-1"></i>
+            <p class="text-xs font-semibold text-emerald-700 uppercase tracking-wide">Invested value</p>
+            <p id="opportunityCostDisplay" class="text-2xl md:text-3xl font-extrabold text-emerald-700 mt-1">$0</p>
+            <span class="absolute -top-2 -right-2 bg-emerald-500 text-white text-xs px-2 py-0.5 rounded-full shadow">8% return</span>
+          </div>
+        </div>
+
+        <!-- Visual progress bar comparing cost vs opportunity -->
+        <div class="bg-gray-100 p-4 rounded-2xl mb-5">
+          <div class="flex justify-between text-sm font-medium text-gray-600 mb-2">
+            <span><i class="fas fa-coins text-gray-500 mr-1"></i> Spent</span>
+            <span><i class="fas fa-rocket text-emerald-600 mr-1"></i> If invested</span>
+          </div>
+          <div class="w-full h-4 bg-gray-200 rounded-full overflow-hidden flex">
+            <div id="spentBar" class="h-full bg-gradient-to-r from-red-400 to-red-500 transition-all duration-700" style="width: 0%;"></div>
+            <div id="investedBar" class="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 transition-all duration-700" style="width: 0%;"></div>
+          </div>
+          <p class="text-xs text-gray-500 mt-2 text-center">
+            You could have <span id="differenceText" class="font-bold text-emerald-700">$0 more</span> in your pocket.
+          </p>
+        </div>
+
+        <!-- Actionable call-to-action / affiliate styled block -->
+        <div class="bg-gradient-to-br from-yellow-50 to-amber-50 border border-yellow-200 rounded-2xl p-5 text-center shadow-sm">
+          <div class="flex items-center justify-center gap-2 mb-2">
+            <i class="fas fa-piggy-bank text-yellow-600 text-xl"></i>
+            <h3 class="font-bold text-yellow-800 text-lg">Stop losing, start building.</h3>
+          </div>
+          <p class="text-sm text-yellow-700 mb-4 max-w-md mx-auto">
+            Redirect just <span id="monthlyRefText" class="font-bold">$50</span>/month into an investment account and watch it grow.
+          </p>
+          <a href="#" target="_blank" class="inline-flex items-center gap-2 bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 px-7 rounded-full shadow-md transition transform hover:scale-105">
+            <i class="fas fa-gift"></i> Get free stock & invest
+          </a>
+          <p class="text-xs text-yellow-600 mt-2 opacity-70">*Affiliate partner · 8% historical average assumed</p>
+        </div>
+
+        <!-- tiny footer note -->
+        <p class="text-xs text-gray-400 text-center mt-5">
+          <i class="far fa-clock"></i> Based on S&P 500 historical average (8% annual, compounded monthly). Not financial advice.
+        </p>
+      </div>
     </div>
+  </div>
 
-    <script>
-        function calculateCost(event) {
-            // Prevent the page from refreshing on form submission
-            event.preventDefault();
-
-            const monthly = parseFloat(document.getElementById('monthlyCost').value);
-            
-            if (isNaN(monthly) || monthly <= 0) {
-                alert("Please enter a valid monthly amount.");
-                return;
-            }
-
-            const yearly = monthly * 12;
-            const tenYear = yearly * 10;
-            
-            // Future value of an ordinary annuity equation 
-            // Rate compounded monthly: 8% / 12 months
-            const rate = 0.08 / 12; 
-            const months = 10 * 12; 
-            const futureValue = monthly * ((Math.pow(1 + rate, months) - 1) / rate);
-
-            // Print formatted currency results to UI
-            document.getElementById('yearlyCost').innerText = '$' + yearly.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
-            document.getElementById('tenYearCost').innerText = '$' + tenYear.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
-            document.getElementById('opportunityCost').innerText = '$' + futureValue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
-
-            // Reveal the hidden results panel
-            document.getElementById('results').classList.remove('hidden');
+  <script>
+    (function() {
+      // Ensure DOM ready
+      window.calculateCost = function() {
+        const monthlyInput = document.getElementById('monthlyCost');
+        const monthly = parseFloat(monthlyInput.value);
+        
+        if (isNaN(monthly) || monthly <= 0) {
+          // gentle shake animation or alert
+          monthlyInput.classList.add('border-red-400');
+          monthlyInput.focus();
+          alert("Please enter a valid monthly subscription amount (greater than $0).");
+          setTimeout(() => monthlyInput.classList.remove('border-red-400'), 1200);
+          return;
         }
-    </script>
+
+        // Calculations
+        const yearly = monthly * 12;
+        const tenYearNominal = yearly * 10;
+        
+        // Future value of annuity (monthly compounding, 8% annual)
+        const annualRate = 0.08;
+        const monthlyRate = annualRate / 12;
+        const months = 10 * 12; // 120 months
+        
+        let futureValue = 0;
+        if (monthlyRate > 0) {
+          futureValue = monthly * ((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate);
+        } else {
+          futureValue = monthly * months; // fallback (shouldn't happen)
+        }
+        
+        // Format currency
+        const formatUSD = (value) => {
+          return value.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        };
+
+        // Update DOM elements
+        document.getElementById('yearlyCostDisplay').innerText = formatUSD(yearly);
+        document.getElementById('tenYearCostDisplay').innerText = formatUSD(tenYearNominal);
+        document.getElementById('opportunityCostDisplay').innerText = formatUSD(futureValue);
+        
+        // Update the affiliate text with user's monthly amount
+        document.getElementById('monthlyRefText').innerText = formatUSD(monthly);
+        
+        // Calculate difference for text
+        const difference = futureValue - tenYearNominal;
+        const diffFormatted = formatUSD(Math.abs(difference));
+        document.getElementById('differenceText').innerHTML = 
+          `<span class="font-bold text-emerald-700">${diffFormatted} more</span> than just saving.`;
+        
+        // Progress bar logic: show proportion between spent (10yr) vs invested value
+        const totalForBar = Math.max(tenYearNominal, futureValue, 1);
+        const spentPercent = (tenYearNominal / totalForBar) * 100;
+        const investedPercent = (futureValue / totalForBar) * 100;
+        
+        document.getElementById('spentBar').style.width = `${spentPercent}%`;
+        document.getElementById('investedBar').style.width = `${investedPercent}%`;
+        
+        // Show results panel with animation
+        const resultsPanel = document.getElementById('resultsPanel');
+        resultsPanel.classList.remove('hidden');
+        // re-trigger animation if already visible
+        resultsPanel.classList.add('slide-up');
+        setTimeout(() => resultsPanel.classList.remove('slide-up'), 400);
+        
+        // Scroll to results smoothly
+        resultsPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      };
+
+      // Quick amount setter
+      window.setQuickAmount = function(amount) {
+        const input = document.getElementById('monthlyCost');
+        input.value = amount;
+        input.focus();
+        // Optionally trigger calculation immediately for better UX
+        // But we let user decide; just set value.
+        // Small visual feedback
+        input.classList.add('border-blue-400');
+        setTimeout(() => input.classList.remove('border-blue-400'), 400);
+      };
+
+      // Allow pressing Enter key to trigger calculation
+      document.getElementById('monthlyCost').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          calculateCost();
+        }
+      });
+
+      // Clear any error class on input
+      document.getElementById('monthlyCost').addEventListener('input', function() {
+        this.classList.remove('border-red-400');
+      });
+
+    })();
+  </script>
 </body>
 </html>
+```
