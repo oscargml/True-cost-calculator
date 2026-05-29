@@ -3,267 +3,373 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-  <title>True Cost • Subscription Opportunity Calculator</title>
-  <!-- Font Awesome 6 for crisp icons -->
+  <title>True Cost • Subscription Calculator</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Additional custom styles for subtle animations & polish -->
+  
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "True Cost • Subscription Opportunity Calculator",
+    "url": "https://yourwebsite.com/opportunity-cost-calculator",
+    "description": "Discover what your monthly subscriptions really cost you in lost investment returns. Add your services and see the true 10-year impact.",
+    "applicationCategory": "FinanceApplication",
+    "operatingSystem": "All",
+    "browserRequirements": "Requires JavaScript. Requires HTML5.",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    }
+  }
+  </script>
+
   <style>
     body {
-      background: linear-gradient(145deg, #f8fafc 0%, #eef2f6 100%);
+      background: #f0f4f8;
       font-family: 'Inter', system-ui, -apple-system, sans-serif;
     }
-    .card-shadow {
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.03);
+    .card {
+      background: white;
+      border-radius: 1.5rem;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.05);
     }
-    .result-value {
+    .toggle-switch {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      background: #d1d5db;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .toggle-switch.active {
+      background: #10b981;
+    }
+    .toggle-switch::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 20px;
+      height: 20px;
+      background: white;
+      border-radius: 50%;
+      transition: transform 0.2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    .toggle-switch.active::after {
+      transform: translateX(20px);
+    }
+    .subscription-card {
       transition: all 0.2s ease;
     }
-    .progress-ring {
-      transition: stroke-dashoffset 0.5s ease-in-out;
+    .subscription-card:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
     }
-    .input-focus:focus-within {
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4);
-      border-radius: 0.75rem;
+    @keyframes popIn {
+      0% { transform: scale(0.9); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
     }
-    .highlight-glow {
-      animation: softPulse 2.2s infinite alternate;
+    .pop-in {
+      animation: popIn 0.3s ease-out;
     }
-    @keyframes softPulse {
-      0% { box-shadow: 0 0 8px rgba(34, 197, 94, 0.3); }
-      100% { box-shadow: 0 0 18px rgba(34, 197, 94, 0.7); }
-    }
-    .slide-up {
-      animation: slideUp 0.35s cubic-bezier(0.23, 1, 0.32, 1) forwards;
-    }
-    @keyframes slideUp {
-      0% { opacity: 0; transform: translateY(20px); }
-      100% { opacity: 1; transform: translateY(0); }
+    .result-number {
+      font-feature-settings: "tnum";
+      font-variant-numeric: tabular-nums;
     }
   </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4 md:p-6">
-
-  <div class="w-full max-w-2xl mx-auto">
-    <!-- Main Card -->
-    <div class="bg-white/90 backdrop-blur-md rounded-3xl card-shadow p-6 md:p-8 transition-all duration-300">
-      
-      <!-- Header with icon -->
-      <div class="flex flex-col items-center text-center mb-6">
-        <div class="bg-blue-100 p-3 rounded-full mb-3 shadow-sm">
-          <i class="fas fa-calculator text-blue-700 text-3xl"></i>
-        </div>
-        <h1 class="text-3xl md:text-4xl font-extrabold text-gray-800 tracking-tight">
-          The <span class="text-blue-600">True Cost</span> Calculator
-        </h1>
-        <p class="text-gray-500 mt-2 max-w-md text-sm md:text-base">
-          Every subscription chips away at your future wealth. See the hidden fortune you could be building.
-        </p>
+<body class="min-h-screen p-4 md:p-8 flex items-start justify-center">
+  
+  <div class="w-full max-w-lg mx-auto pt-4 md:pt-8">
+    
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-2xl mb-4">
+        <i class="fas fa-calculator text-blue-600 text-2xl"></i>
       </div>
+      <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-2">
+        True Cost Calculator
+      </h1>
+      <p class="text-gray-500 text-sm md:text-base max-w-sm mx-auto">
+        See what your subscriptions <span class="font-semibold text-gray-700">really</span> cost in lost wealth
+      </p>
+    </div>
 
-      <!-- Form Section -->
-      <form id="calcForm" class="space-y-5" onsubmit="return false;">
-        <div class="input-focus transition-all">
-          <label for="monthlyCost" class="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-            <i class="fas fa-wallet text-blue-500"></i> Monthly subscriptions total
-          </label>
-          <div class="relative">
-            <span class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-              <span class="text-gray-400 font-medium text-lg">$</span>
-            </span>
+    <!-- Main Card -->
+    <div class="card p-6 md:p-8 mb-6">
+      
+      <!-- Step 1: Add Subscriptions -->
+      <div class="mb-8">
+        <h2 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+          <span class="w-7 h-7 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">1</span>
+          Your subscriptions
+        </h2>
+
+        <!-- Popular services as chips -->
+        <div class="mb-4">
+          <p class="text-xs font-medium text-gray-400 uppercase tracking-wide mb-2">Tap to add</p>
+          <div class="flex flex-wrap gap-2">
+            <button onclick="toggleSubscription('Netflix', 15.99)" data-sub="Netflix" class="sub-chip px-4 py-2.5 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-xl border border-gray-200 text-sm font-medium transition flex items-center gap-2">
+              <i class="fab fa-netflix text-red-500"></i> Netflix <span class="text-gray-400 text-xs">$15.99</span>
+            </button>
+            <button onclick="toggleSubscription('Spotify', 11.99)" data-sub="Spotify" class="sub-chip px-4 py-2.5 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-xl border border-gray-200 text-sm font-medium transition flex items-center gap-2">
+              <i class="fab fa-spotify text-green-500"></i> Spotify <span class="text-gray-400 text-xs">$11.99</span>
+            </button>
+            <button onclick="toggleSubscription('iCloud+', 9.99)" data-sub="iCloud+" class="sub-chip px-4 py-2.5 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-xl border border-gray-200 text-sm font-medium transition flex items-center gap-2">
+              <i class="fab fa-apple text-gray-700"></i> iCloud+ <span class="text-gray-400 text-xs">$9.99</span>
+            </button>
+            <button onclick="toggleSubscription('Prime', 14.99)" data-sub="Prime" class="sub-chip px-4 py-2.5 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-xl border border-gray-200 text-sm font-medium transition flex items-center gap-2">
+              <i class="fab fa-amazon text-blue-500"></i> Prime <span class="text-gray-400 text-xs">$14.99</span>
+            </button>
+            <button onclick="toggleSubscription('Disney+', 13.99)" data-sub="Disney+" class="sub-chip px-4 py-2.5 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-xl border border-gray-200 text-sm font-medium transition flex items-center gap-2">
+              <i class="fas fa-tv text-indigo-500"></i> Disney+ <span class="text-gray-400 text-xs">$13.99</span>
+            </button>
+            <button onclick="toggleSubscription('Gym', 45.00)" data-sub="Gym" class="sub-chip px-4 py-2.5 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-xl border border-gray-200 text-sm font-medium transition flex items-center gap-2">
+              <i class="fas fa-dumbbell text-orange-500"></i> Gym <span class="text-gray-400 text-xs">$45.00</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Custom add -->
+        <div class="flex gap-2 mt-4">
+          <input 
+            type="text" 
+            id="customName" 
+            placeholder="Service name" 
+            class="flex-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:bg-white transition"
+          >
+          <div class="relative w-32">
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">$</span>
             <input 
               type="number" 
-              id="monthlyCost" 
+              id="customCost" 
+              placeholder="0.00" 
               step="0.01" 
-              min="0.01" 
-              placeholder="e.g., 79.99" 
-              class="w-full pl-10 pr-4 py-3.5 border border-gray-200 rounded-xl bg-gray-50 text-gray-900 font-medium text-lg focus:outline-none focus:ring-0 focus:border-blue-400 transition-colors"
-              autofocus
-              required
+              min="0.01"
+              class="w-full pl-8 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:bg-white transition"
             >
           </div>
-          <p class="text-xs text-gray-400 mt-1.5 flex items-center gap-1">
-            <i class="fas fa-info-circle"></i> Netflix, Spotify, gym, apps – add them all up.
-          </p>
+          <button 
+            onclick="addCustom()"
+            class="px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition flex items-center gap-1 text-sm"
+          >
+            <i class="fas fa-plus"></i> Add
+          </button>
         </div>
+      </div>
 
-        <!-- Quick suggestion chips -->
-        <div class="flex flex-wrap gap-2 mt-1">
-          <span class="text-xs font-semibold text-gray-500 self-center">Quick add:</span>
-          <button type="button" onclick="setQuickAmount(15.99)" class="px-3 py-1.5 bg-gray-100 hover:bg-blue-50 text-gray-700 hover:text-blue-700 text-xs font-medium rounded-full border border-gray-200 transition">Netflix</button>
-          <button type="button" onclick="setQuickAmount(11.99)" class="px-3 py-1.5 bg-gray-100 hover:bg-blue-50 text-gray-700 hover:text-blue-700 text-xs font-medium rounded-full border border-gray-200 transition">Spotify</button>
-          <button type="button" onclick="setQuickAmount(45.00)" class="px-3 py-1.5 bg-gray-100 hover:bg-blue-50 text-gray-700 hover:text-blue-700 text-xs font-medium rounded-full border border-gray-200 transition">Gym</button>
-          <button type="button" onclick="setQuickAmount(9.99)" class="px-3 py-1.5 bg-gray-100 hover:bg-blue-50 text-gray-700 hover:text-blue-700 text-xs font-medium rounded-full border border-gray-200 transition">iCloud+</button>
+      <!-- Active Subscriptions List -->
+      <div id="activeList" class="mb-6">
+        <div id="emptyMessage" class="text-center py-6 text-gray-400">
+          <i class="fas fa-inbox text-3xl mb-2 block"></i>
+          <p class="text-sm">Tap services above to add them</p>
         </div>
+        <div id="subscriptionCards" class="space-y-2 hidden"></div>
+      </div>
 
-        <button 
-          type="submit" 
-          id="calculateBtn"
-          onclick="calculateCost()"
-          class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-3.5 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2 text-lg"
-        >
-          <i class="fas fa-chart-line"></i> Reveal Future Cost
-        </button>
-      </form>
+      <!-- Running Total -->
+      <div id="totalBar" class="hidden bg-gray-50 rounded-2xl p-4 mb-6">
+        <div class="flex justify-between items-center">
+          <span class="text-gray-600 text-sm font-medium">Monthly total</span>
+          <span id="monthlyTotal" class="text-2xl font-extrabold text-blue-700 result-number">$0</span>
+        </div>
+      </div>
 
-      <!-- Dynamic Results Area (hidden by default) -->
-      <div id="resultsPanel" class="mt-8 hidden slide-up">
+      <!-- Calculate Button -->
+      <button 
+        onclick="calculate()"
+        id="calcBtn"
+        disabled
+        class="w-full bg-gray-200 text-gray-400 font-bold py-4 rounded-2xl transition-all duration-200 flex items-center justify-center gap-2 text-lg disabled:cursor-not-allowed"
+      >
+        <i class="fas fa-chart-line"></i> See True Cost
+      </button>
+
+      <!-- Results (hidden until calculation) -->
+      <div id="results" class="hidden mt-8 pop-in">
+        <hr class="mb-6 border-gray-100">
         
-        <!-- Core numbers in cards -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-          <div class="bg-red-50 p-4 rounded-2xl border border-red-100 text-center">
-            <i class="fas fa-calendar-alt text-red-400 mb-1"></i>
-            <p class="text-xs font-semibold text-red-600 uppercase tracking-wide">Yearly drain</p>
-            <p id="yearlyCostDisplay" class="text-2xl font-extrabold text-red-600 mt-1">$0</p>
+        <!-- Big impact number -->
+        <div class="text-center mb-6">
+          <p class="text-sm text-gray-500 mb-1">Your subscriptions could be worth</p>
+          <p id="bigNumber" class="text-5xl md:text-6xl font-extrabold text-emerald-600 result-number">$0</p>
+          <p class="text-sm text-gray-400 mt-1">if invested over 10 years</p>
+        </div>
+
+        <!-- Breakdown cards -->
+        <div class="grid grid-cols-2 gap-3 mb-6">
+          <div class="bg-red-50 p-4 rounded-2xl text-center">
+            <p class="text-xs text-red-500 font-medium mb-1">You'll spend</p>
+            <p id="totalSpent" class="text-xl font-extrabold text-red-600 result-number">$0</p>
+            <p class="text-xs text-red-400">in 10 years</p>
           </div>
-          <div class="bg-orange-50 p-4 rounded-2xl border border-orange-100 text-center">
-            <i class="fas fa-clock text-orange-400 mb-1"></i>
-            <p class="text-xs font-semibold text-orange-600 uppercase tracking-wide">10-year cost</p>
-            <p id="tenYearCostDisplay" class="text-2xl font-extrabold text-orange-600 mt-1">$0</p>
-          </div>
-          <div class="bg-emerald-50 p-4 rounded-2xl border border-emerald-100 text-center relative highlight-glow">
-            <i class="fas fa-seedling text-emerald-500 mb-1"></i>
-            <p class="text-xs font-semibold text-emerald-700 uppercase tracking-wide">Invested value</p>
-            <p id="opportunityCostDisplay" class="text-2xl md:text-3xl font-extrabold text-emerald-700 mt-1">$0</p>
-            <span class="absolute -top-2 -right-2 bg-emerald-500 text-white text-xs px-2 py-0.5 rounded-full shadow">8% return</span>
+          <div class="bg-gray-100 p-4 rounded-2xl text-center">
+            <p class="text-xs text-gray-500 font-medium mb-1">Yearly cost</p>
+            <p id="yearlyDisplay" class="text-xl font-extrabold text-gray-700 result-number">$0</p>
+            <p class="text-xs text-gray-400">per year</p>
           </div>
         </div>
 
-        <!-- Visual progress bar comparing cost vs opportunity -->
-        <div class="bg-gray-100 p-4 rounded-2xl mb-5">
-          <div class="flex justify-between text-sm font-medium text-gray-600 mb-2">
-            <span><i class="fas fa-coins text-gray-500 mr-1"></i> Spent</span>
-            <span><i class="fas fa-rocket text-emerald-600 mr-1"></i> If invested</span>
+        <!-- Simple bar -->
+        <div class="mb-6">
+          <div class="flex justify-between text-xs text-gray-500 mb-1">
+            <span>Spent</span>
+            <span>Invested</span>
           </div>
-          <div class="w-full h-4 bg-gray-200 rounded-full overflow-hidden flex">
-            <div id="spentBar" class="h-full bg-gradient-to-r from-red-400 to-red-500 transition-all duration-700" style="width: 0%;"></div>
-            <div id="investedBar" class="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 transition-all duration-700" style="width: 0%;"></div>
+          <div class="h-3 bg-gray-200 rounded-full overflow-hidden flex">
+            <div id="spentFill" class="bg-red-400 transition-all duration-700" style="width:50%"></div>
+            <div id="investedFill" class="bg-emerald-400 transition-all duration-700" style="width:50%"></div>
           </div>
-          <p class="text-xs text-gray-500 mt-2 text-center">
-            You could have <span id="differenceText" class="font-bold text-emerald-700">$0 more</span> in your pocket.
-          </p>
         </div>
 
-        <!-- Actionable call-to-action / affiliate styled block -->
-        <div class="bg-gradient-to-br from-yellow-50 to-amber-50 border border-yellow-200 rounded-2xl p-5 text-center shadow-sm">
-          <div class="flex items-center justify-center gap-2 mb-2">
-            <i class="fas fa-piggy-bank text-yellow-600 text-xl"></i>
-            <h3 class="font-bold text-yellow-800 text-lg">Stop losing, start building.</h3>
-          </div>
-          <p class="text-sm text-yellow-700 mb-4 max-w-md mx-auto">
-            Redirect just <span id="monthlyRefText" class="font-bold">$50</span>/month into an investment account and watch it grow.
-          </p>
-          <a href="#" target="_blank" class="inline-flex items-center gap-2 bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 px-7 rounded-full shadow-md transition transform hover:scale-105">
-            <i class="fas fa-gift"></i> Get free stock & invest
+        <!-- CTA -->
+        <div class="bg-yellow-50 border border-yellow-200 rounded-2xl p-5 text-center">
+          <p class="font-bold text-yellow-800 mb-1">Don't leave money on the table</p>
+          <p class="text-sm text-yellow-700 mb-3">Start investing what you save</p>
+          <a href="#" class="inline-block bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 px-8 rounded-xl transition">
+            Get started →
           </a>
-          <p class="text-xs text-yellow-600 mt-2 opacity-70">*Affiliate partner · 8% historical average assumed</p>
         </div>
-
-        <!-- tiny footer note -->
-        <p class="text-xs text-gray-400 text-center mt-5">
-          <i class="far fa-clock"></i> Based on S&P 500 historical average (8% annual, compounded monthly). Not financial advice.
-        </p>
       </div>
     </div>
   </div>
 
   <script>
-    (function() {
-      // Ensure DOM ready
-      window.calculateCost = function() {
-        const monthlyInput = document.getElementById('monthlyCost');
-        const monthly = parseFloat(monthlyInput.value);
-        
-        if (isNaN(monthly) || monthly <= 0) {
-          // gentle shake animation or alert
-          monthlyInput.classList.add('border-red-400');
-          monthlyInput.focus();
-          alert("Please enter a valid monthly subscription amount (greater than $0).");
-          setTimeout(() => monthlyInput.classList.remove('border-red-400'), 1200);
-          return;
-        }
+    let subscriptions = [];
 
-        // Calculations
-        const yearly = monthly * 12;
-        const tenYearNominal = yearly * 10;
-        
-        // Future value of annuity (monthly compounding, 8% annual)
-        const annualRate = 0.08;
-        const monthlyRate = annualRate / 12;
-        const months = 10 * 12; // 120 months
-        
-        let futureValue = 0;
-        if (monthlyRate > 0) {
-          futureValue = monthly * ((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate);
-        } else {
-          futureValue = monthly * months; // fallback (shouldn't happen)
-        }
-        
-        // Format currency
-        const formatUSD = (value) => {
-          return value.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 });
-        };
+    function toggleSubscription(name, cost) {
+      const index = subscriptions.findIndex(s => s.name === name);
+      const chip = document.querySelector(`[data-sub="${name}"]`);
+      
+      if (index > -1) {
+        subscriptions.splice(index, 1);
+        chip?.classList.remove('ring-2', 'ring-blue-500', 'bg-blue-50');
+      } else {
+        subscriptions.push({ name, cost });
+        chip?.classList.add('ring-2', 'ring-blue-500', 'bg-blue-50');
+      }
+      
+      renderAll();
+    }
 
-        // Update DOM elements
-        document.getElementById('yearlyCostDisplay').innerText = formatUSD(yearly);
-        document.getElementById('tenYearCostDisplay').innerText = formatUSD(tenYearNominal);
-        document.getElementById('opportunityCostDisplay').innerText = formatUSD(futureValue);
-        
-        // Update the affiliate text with user's monthly amount
-        document.getElementById('monthlyRefText').innerText = formatUSD(monthly);
-        
-        // Calculate difference for text
-        const difference = futureValue - tenYearNominal;
-        const diffFormatted = formatUSD(Math.abs(difference));
-        document.getElementById('differenceText').innerHTML = 
-          `<span class="font-bold text-emerald-700">${diffFormatted} more</span> than just saving.`;
-        
-        // Progress bar logic: show proportion between spent (10yr) vs invested value
-        const totalForBar = Math.max(tenYearNominal, futureValue, 1);
-        const spentPercent = (tenYearNominal / totalForBar) * 100;
-        const investedPercent = (futureValue / totalForBar) * 100;
-        
-        document.getElementById('spentBar').style.width = `${spentPercent}%`;
-        document.getElementById('investedBar').style.width = `${investedPercent}%`;
-        
-        // Show results panel with animation
-        const resultsPanel = document.getElementById('resultsPanel');
-        resultsPanel.classList.remove('hidden');
-        // re-trigger animation if already visible
-        resultsPanel.classList.add('slide-up');
-        setTimeout(() => resultsPanel.classList.remove('slide-up'), 400);
-        
-        // Scroll to results smoothly
-        resultsPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      };
+    function addCustom() {
+      const nameInput = document.getElementById('customName');
+      const costInput = document.getElementById('customCost');
+      const name = nameInput.value.trim();
+      const cost = parseFloat(costInput.value);
+      
+      if (!name) { nameInput.focus(); return; }
+      if (isNaN(cost) || cost <= 0) { costInput.focus(); return; }
+      
+      // Check if already exists
+      const existing = subscriptions.find(s => s.name.toLowerCase() === name.toLowerCase());
+      if (existing) {
+        existing.cost = cost; // Update cost
+      } else {
+        subscriptions.push({ name, cost });
+      }
+      
+      nameInput.value = '';
+      costInput.value = '';
+      nameInput.focus();
+      renderAll();
+    }
 
-      // Quick amount setter
-      window.setQuickAmount = function(amount) {
-        const input = document.getElementById('monthlyCost');
-        input.value = amount;
-        input.focus();
-        // Optionally trigger calculation immediately for better UX
-        // But we let user decide; just set value.
-        // Small visual feedback
-        input.classList.add('border-blue-400');
-        setTimeout(() => input.classList.remove('border-blue-400'), 400);
-      };
+    function removeSubscription(name) {
+      subscriptions = subscriptions.filter(s => s.name !== name);
+      const chip = document.querySelector(`[data-sub="${name}"]`);
+      chip?.classList.remove('ring-2', 'ring-blue-500', 'bg-blue-50');
+      renderAll();
+    }
 
-      // Allow pressing Enter key to trigger calculation
-      document.getElementById('monthlyCost').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          calculateCost();
-        }
-      });
+    function getTotal() {
+      return subscriptions.reduce((sum, s) => sum + s.cost, 0);
+    }
 
-      // Clear any error class on input
-      document.getElementById('monthlyCost').addEventListener('input', function() {
-        this.classList.remove('border-red-400');
-      });
+    function renderAll() {
+      const total = getTotal();
+      const emptyMsg = document.getElementById('emptyMessage');
+      const cardsContainer = document.getElementById('subscriptionCards');
+      const totalBar = document.getElementById('totalBar');
+      const monthlyTotal = document.getElementById('monthlyTotal');
+      const calcBtn = document.getElementById('calcBtn');
+      const results = document.getElementById('results');
+      
+      // Hide results when subscriptions change
+      results.classList.add('hidden');
+      
+      if (subscriptions.length === 0) {
+        emptyMsg.classList.remove('hidden');
+        cardsContainer.classList.add('hidden');
+        totalBar.classList.add('hidden');
+        calcBtn.disabled = true;
+        calcBtn.className = 'w-full bg-gray-200 text-gray-400 font-bold py-4 rounded-2xl transition-all duration-200 flex items-center justify-center gap-2 text-lg disabled:cursor-not-allowed';
+        return;
+      }
+      
+      emptyMsg.classList.add('hidden');
+      cardsContainer.classList.remove('hidden');
+      totalBar.classList.remove('hidden');
+      calcBtn.disabled = false;
+      calcBtn.className = 'w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-2xl transition-all duration-200 flex items-center justify-center gap-2 text-lg shadow-md';
+      
+      // Render cards
+      cardsContainer.innerHTML = subscriptions.map(sub => `
+        <div class="subscription-card flex items-center justify-between bg-white border border-gray-100 p-3 rounded-xl pop-in">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center text-gray-600 text-sm font-bold">
+              ${sub.name.charAt(0)}
+            </div>
+            <span class="font-medium text-gray-800 text-sm">${sub.name}</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="font-bold text-gray-700">$${sub.cost.toFixed(2)}</span>
+            <button onclick="removeSubscription('${sub.name}')" class="text-gray-400 hover:text-red-500 transition p-1">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </div>
+      `).join('');
+      
+      monthlyTotal.textContent = `$${total.toFixed(2)}`;
+    }
 
-    })();
+    function calculate() {
+      const monthly = getTotal();
+      if (monthly <= 0) return;
+      
+      const yearly = monthly * 12;
+      const tenYearSpent = yearly * 10;
+      const r = 0.08 / 12;
+      const n = 120;
+      const futureValue = monthly * ((Math.pow(1 + r, n) - 1) / r);
+      
+      const fmt = (v) => v.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 });
+      
+      document.getElementById('bigNumber').textContent = fmt(futureValue);
+      document.getElementById('totalSpent').textContent = fmt(tenYearSpent);
+      document.getElementById('yearlyDisplay').textContent = fmt(yearly);
+      
+      const max = Math.max(tenYearSpent, futureValue);
+      document.getElementById('spentFill').style.width = `${(tenYearSpent/max)*100}%`;
+      document.getElementById('investedFill').style.width = `${(futureValue/max)*100}%`;
+      
+      const results = document.getElementById('results');
+      results.classList.remove('hidden');
+      results.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    // Enter key handling
+    document.getElementById('customCost').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') addCustom();
+    });
+    document.getElementById('customName').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') document.getElementById('customCost').focus();
+    });
   </script>
 </body>
 </html>
-```
